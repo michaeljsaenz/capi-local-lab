@@ -1,0 +1,27 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: cert-manager
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      tls: cert-manager
+  repoURL: http://${CHART_SERVER_IP}:8879
+  chartName: cert-manager
+  releaseName: cert-manager
+  namespace: cert-manager
+  version: "v1.13.3"
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 10m
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    installCRDs: true
+    global:
+      leaderElection:
+        namespace: cert-manager
+    prometheus:
+      enabled: true

@@ -1,0 +1,67 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: cilium
+  namespace: default
+spec:
+  # Which clusters to deploy to
+  clusterSelector:
+    matchLabels:
+      cni: cilium
+
+  # Helm release name
+  releaseName: cilium
+  
+  # Helm chart details - using containerized chart server
+  chartName: cilium
+  repoURL: http://${CHART_SERVER_IP}:8879
+  version: "1.14.5"
+  
+  # Target namespace in workload clusters
+  namespace: kube-system
+  
+  # Cilium configuration values
+  valuesTemplate: |
+    # API Server access - direct to bypass service (required for CAPI Docker)
+    k8sServiceHost: "{{ .Cluster.spec.controlPlaneEndpoint.host }}"
+    k8sServicePort: "{{ .Cluster.spec.controlPlaneEndpoint.port }}"
+    
+    # IP Address Management - use cluster-pool for CAPI clusters
+    ipam:
+      mode: cluster-pool
+      operator:
+        clusterPoolIPv4PodCIDRList:
+          - "10.244.0.0/16"
+        clusterPoolIPv4MaskSize: 24
+    
+    # Disable Hubble for simplicity (we can enable later)
+    hubble:
+      enabled: false
+      relay:
+        enabled: false
+      ui:
+        enabled: false
+    
+    # Networking mode
+    routingMode: tunnel
+    tunnelProtocol: vxlan
+    
+    # Resource limits (light for Docker)
+    resources:
+      limits:
+        cpu: 500m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    
+    # Operator settings - MERGED (no duplicate keys)
+    operator:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi

@@ -1,0 +1,5 @@
+# Fleet bundle configuration for the hello-world app.
+# This file tells Fleet how to render/deploy the manifests in this directory.
+# The namespace here is where the workload is created ON THE TARGET (downstream)
+# cluster, not on the management cluster.
+defaultNamespace: default

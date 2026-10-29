@@ -1,0 +1,42 @@
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: capi-clusters
+  namespace: fleet-local
+spec:
+  # Point to local git daemon (serving the repo parent dir over git://).
+  # host.docker.internal resolves to the host machine from inside pods.
+  # Substituted at apply time from $CANONICAL_REPO (default in p0/scripts/bootstrap.sh).
+  repo: git://host.docker.internal/${CANONICAL_REPO}
+
+  # IMPORTANT: Fleet clones a COMMITTED git ref, it does NOT read your working
+  # tree. This branch MUST be the branch you actually commit cluster changes to,
+  # and every path below MUST exist (committed) on that branch, or Fleet reports
+  # the bundles as empty.
+  #
+  # Not hardcoded: substituted at apply time from $GIT_BRANCH via envsubst, e.g.
+  #     export CANONICAL_REPO=capi-local-lab
+  #     export GIT_BRANCH=$(git branch --show-current)
+  #     envsubst < p1/gitrepo.yaml | kubectl apply -f -
+  #
+  #   Verify match: kubectl -n fleet-local get gitrepo capi-clusters \
+  #                   -o jsonpath='{.spec.branch}'
+  #   After committing new paths, force a re-sync:
+  #     kubectl -n fleet-local patch gitrepo capi-clusters --type=merge \
+  #       -p '{"spec":{"forceSyncGeneration":<N+1>}}'
+  branch: ${GIT_BRANCH}
+
+  # Watch this subdirectory (path is relative to the repo root, on `branch`)
+  # for cluster definitions. It must be committed on `branch` to be picked up.
+  paths:
+  - p1/clusters/local
+  
+  # Disable git operations and use local content
+  disablePolling: false
+  
+  # Apply cluster definitions to the management cluster itself
+  targets:
+  - name: local
+    clusterSelector:
+      matchLabels:
+        management.cattle.io/cluster-display-name: local

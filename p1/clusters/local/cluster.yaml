@@ -1,0 +1,34 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: local-cluster
+  namespace: default
+  labels:
+    environment: local
+    cni: cilium
+    ingress: nginx
+    tls: cert-manager
+    fleet-registration: enabled
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.244.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  topology:
+    class: quick-start
+    version: v1.30.0
+    workers:
+      machineDeployments:
+      - class: default-worker
+        name: md-0
+        replicas: 2
+    variables:
+    - name: imageRepository
+      value: ""
+    - name: etcdImageTag
+      value: ""
+    - name: coreDNSImageTag
+      value: ""

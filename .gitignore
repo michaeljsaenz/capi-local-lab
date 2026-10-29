@@ -1,0 +1,46 @@
+# ==========================================
+# macOS System Files
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon headers for macOS folders
+Icon?
+
+# Thumbnails and Spotlight metadata
+._*
+.Spotlight-V100
+.Trashes
+
+# Files created by the Finder
+.fseventsd
+
+# Files created by Disk Images
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ==========================================
+# Visual Studio Code (VS Code)
+# ==========================================
+# Ignore all files in the .vscode folder...
+.vscode/*
+
+# ...except for useful team settings/configurations:
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History extension
+.history/
+
+# User workspace configuration
+*.code-workspace
+
+# Built-in VS Code crash dumps / test outputs
+.vscode-test/
