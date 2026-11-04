@@ -1,4 +1,4 @@
-.PHONY: bootstrap destroy provision deprovision verify onboard offboard
+.PHONY: bootstrap destroy provision deprovision verify onboard offboard up down
 
 # Phase 0: host runtime + management plane (CAPI, CAPD, CAAPH, CAAPF, Fleet).
 bootstrap:
@@ -27,3 +27,12 @@ onboard:
 # Tear down Phase 2: remove the apps GitRepo (Phases 0 and 1 stay).
 offboard:
 	p2/scripts/offboard.sh
+
+# Phase 3: the whole platform in one command (bootstrap -> provision -> onboard),
+# gated on readiness between phases.
+up:
+	p3/scripts/up.sh
+
+# Tear down Phase 3: offboard -> deprovision -> destroy, back to a clean host.
+down:
+	p3/scripts/down.sh
